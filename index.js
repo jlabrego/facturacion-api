@@ -1,7 +1,9 @@
 import express from 'express'
 import dotenv from 'dotenv/config'
 import { pool } from './src/db/db.js'
-
+app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/products', productRoutes)
+app.use('/api/v1/invoices', invoiceRoutes)
 
 const app = express()
 app.use(express.json())
@@ -14,10 +16,10 @@ app.get('/', (req, res) => {
 })
 try {
     const connection = await pool.getConnection()
-    console.log('✅ Base de datos conectada')
+    console.log(' Base de datos conectada')
     connection.release()
 } catch (error) {
-    console.error('❌ Error al conectar la base de datos')
+    console.error('Error al conectar la base de datos')
     console.error(error.message)
 }
 app.listen(PORT,() => {
