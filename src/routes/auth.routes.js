@@ -1,5 +1,15 @@
-import { Router } from 'express'
+import { pool } from '../db/db.js'
 
-const router = Router()
+export default class AuthModel {
 
-export default router
+    static login = async ({ email }) => {
+
+        await using conn = await pool.getConnection()
+
+        const [result] = await conn.execute(`SELECT id, email, password_hash, role from users where email = ? `,[email])
+
+            return result[0]
+
+    }
+
+}
