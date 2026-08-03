@@ -44,7 +44,8 @@ CREATE TABLE invoice_details (
 
 -- Registros Iniciales de Prueba (Passwords corresponden a "123456")
 INSERT INTO users (id, name, email, password_hash, role) VALUES
-(1, 'Admin Sistema', 'admin@factura.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s58G8L85aY6Ke', 'ADMIN'),
+(1, 'Admin Sistema', 'admin@factura.com','$2b$10$T4bUDZbxzXeXWhG9.wz72OPhIHDsyYLXKgQ6dmtKeXK/sFBaUWhWG',
+'ADMIN'),
 (2, 'Cajero Juan', 'juan@factura.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s58G8L85aY6Ke', 'CASHIER'),
 (3, 'Cajera Maria', 'maria@factura.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6L6s58G8L85aY6Ke', 'CASHIER');
 

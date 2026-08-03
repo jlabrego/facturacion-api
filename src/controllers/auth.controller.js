@@ -5,12 +5,11 @@ import { jsonResponse } from '../helpers/json_response.js'
 
 
 export const login = async (req, res) => {
-
+   
     try {
 
         const { email, password} = req.body
     const user = await AuthModel.login({ email })
-
     if(!user) {
         return res.status(401).json(jsonResponse({
             status: 401,
@@ -18,13 +17,20 @@ export const login = async (req, res) => {
         }))
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password_hash)
-    if(!isValidPassword) {
-        return res.status(401).json(jsonResponse({
+const isValidPassword = await bcrypt.compare(
+    password,
+    user.password_hash
+)
+
+
+if (!isValidPassword) {
+    return res.status(401).json(
+        jsonResponse({
             status: 401,
             message: 'Credenciales inválidas'
-        }))
-    }
+        })
+    )
+}
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' })  
 
