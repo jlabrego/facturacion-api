@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/products', productRouter)
 
+
 try {
     const connection = await pool.getConnection()
     console.log(' Base de datos conectada')
