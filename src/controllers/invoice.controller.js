@@ -1,14 +1,9 @@
 import InvoicesModel from "../models/invoice.model.js"
 import { jsonResponse } from "../helpers/json_response.js"
-
+import { invoiceSchema } from "../schemas/invoice.schema.js";
 
 export const createInvoice = async (req, res) => {
 
-    const invoice = {
-        ...req.body,
-        user_id: req.user.id,
-    }
-    
     if(req.user.role !== 'ADMIN' && req.user.role !== 'CASHIER'){
         return res.status(403).json(jsonResponse({
             status: 403,
@@ -16,6 +11,21 @@ export const createInvoice = async (req, res) => {
             data: null
         }))
     }
+
+    const validation = invoiceSchema.safeParse(req.body);
+
+    if (!validation.success) {
+        return res.status(400).json(jsonResponse({
+            status: 400,
+            message: "Datos inválidos",
+            data: validation.error.flatten()
+        }))
+    }
+
+    const invoice = {
+        ...validation.data,
+        user_id: req.user.id
+    };
 
     try {
         const result = await InvoicesModel.createInvoice(invoice)
@@ -62,7 +72,7 @@ export const getInvoices = async (req, res) => {
     }
 
     try{
-        const invoices = await InvoicesModel.getInvoicesByUserId(user.id)
+        const invoices = await InvoicesModel.getInvoices(req.user)
         return res.status(200).json(jsonResponse({
             status: 200,
             message: "Facturas obtenidas exitosamente",
@@ -70,6 +80,8 @@ export const getInvoices = async (req, res) => {
         }))
     }
     catch (error){
+    console.log(error)
+        
         return res.status(500).json(jsonResponse({
             status: 500,
             message: "Error interno del servidor",

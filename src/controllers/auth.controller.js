@@ -2,18 +2,31 @@ import AuthModel from '../models/auth.model.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { jsonResponse } from '../helpers/json_response.js'
+import { loginSchema } from '../schemas/auth.schema.js';
 
 
 export const login = async (req, res) => {
+    
+    const validation = loginSchema.safeParse(req.body);
+
+        if (!validation.success) {
+            return res.status(400).json(jsonResponse({
+            status: 400,
+            message: "Datos inválidos",
+            data: validation.error.flatten()
+        }));
+    }
    
     try {
 
-        const { email, password} = req.body
-    const user = await AuthModel.login({ email })
-    if(!user) {
-        return res.status(401).json(jsonResponse({
+        const { email, password } = validation.data;
+
+        const user = await AuthModel.login({ email })
+            if(!user) {
+            return res.status(401).json(jsonResponse({
             status: 401,
-            message: 'Credenciales inválidas'
+            message: 'Credenciales inválidas',
+            data: null
         }))
     }
 
@@ -27,7 +40,8 @@ if (!isValidPassword) {
     return res.status(401).json(
         jsonResponse({
             status: 401,
-            message: 'Credenciales inválidas'
+            message: 'Credenciales inválidas',
+            data: null
         })
     )
 }
@@ -50,7 +64,9 @@ if (!isValidPassword) {
         console.error("Error en login:", error)
         res.status(500).json(jsonResponse({ 
             status: 500, 
-            message: 'Error interno del servidor' }))
+            message: 'Error interno del servidor',
+            data: null
+         }))
     }
 
 }
