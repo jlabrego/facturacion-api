@@ -3,6 +3,7 @@ import dotenv from 'dotenv/config'
 import { pool } from './src/db/db.js'
 import authRoutes from './src/routes/auth.routes.js'
 import productRouter from './src/routes/product.routes.js'
+import invoiceRouter from './src/routes/invoice.routes.js'
 
 const app = express()
 app.use(express.json())
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/products', productRouter)
+app.use('/api/v1/invoices', invoiceRouter)
 
 
 try {
