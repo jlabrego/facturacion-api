@@ -149,8 +149,8 @@ export const voidInvoice = async (req, res) => {
     catch (error){
         if(error.message === "Factura no encontrada") {
 
-            return res.status(401).json(jsonResponse({
-                status: 401,
+            return res.status(404).json(jsonResponse({
+                status: 404,
                 message: error.message,
                 data: null
             }))

@@ -1,8 +1,12 @@
 import {jsonResponse} from '../helpers/json_response.js'
 import ProductsModel from '../models/product.model.js'
+import {productSchema, updateStockSchema} from '../schemas/product.schema.js';
+
 
 export const getProducts = async (req, res) => {
+
     try{
+
         const products = await ProductsModel.getProducts()
         return res.status(200).json(jsonResponse({
             status: 200,
@@ -10,60 +14,88 @@ export const getProducts = async (req, res) => {
             data: products
         }))
     }
-    catch(e){{
+    catch(e){
         return res.status(500).json(jsonResponse({
             status: 500,
             message: "Error al obtener los productos",
             data: null
         }))
     }
-}}
+}
 
 export const createProduct = async (req, res) => {
-    try{
-        const product = req.body
 
-        if(req.user.role !== 'ADMIN'){
-            return res.status(403).json(jsonResponse({
-                status: 403,
-                message: 'No tienes permisos para crear productos',
-                data: null
-            }))
-        }
-
+    if(req.user.role !== 'ADMIN'){
         
-            
-            const productId = await ProductsModel.createProduct(product)
+        return res.status(403).json(jsonResponse({
+            status: 403,
+            message: 'No tienes permisos para crear productos',
+            data: null
+        }))
+    }
+
+    const validation = productSchema.safeParse(req.body)
+
+    if (!validation.success) {
+        return res.status(400).json(jsonResponse({
+            status: 400,
+            message: "Datos inválidos",
+            data: validation.error.flatten()
+        }))
+    }
+
+    const product = validation.data
+
+    try{
+        const productId = await ProductsModel.createProduct(product)
             return res.status(201).json(jsonResponse({
                 status: 201,
                 message: 'Producto creado correctamente',
                 data: {id: productId}
             }))
-    }catch(e){
-        return res.status(500).json(jsonResponse({
-            status: 500,
-            message: "Error al crear el producto",
-            data: null
+        }
+
+    catch (e) {
+    console.error(e)
+
+     return res.status(500).json(jsonResponse({
+        status: 500,
+        message: "Error al crear el producto",
+        data: null
         }))
     }
 }
 
 export const updateStock = async (req, res) => {
 
-    try{
+    if(req.user.role !== 'ADMIN'){
+        return res.status(403).json(jsonResponse({
+            status: 403,
+            message: 'No tienes permisos para actualizar el stock',
+            data: null
+        }))
+    }
+
+    const validation = updateStockSchema.safeParse(req.body)
+
+    if (!validation.success) {
+        return res.status(400).json(jsonResponse({
+            status: 400,
+            message: "Datos inválidos",
+            data: validation.error.flatten()
+        }))
+    }
+
+    try {
 
         const { id } = req.params
-        const { stock_to_add } = req.body
+        const { stock_to_add } = validation.data
 
-        if(req.user.role !== 'ADMIN'){
-            return res.status(403).json(jsonResponse({
-                status: 403,
-                message: 'No tienes permisos para actualizar el stock',
-                data: null
-            }))
-        }
+        const updateRows = await ProductsModel.updateStock({
+            id,
+            stock_to_add
+        })
 
-        const updateRows = await ProductsModel.updateStock({ id, stock_to_add })
         if(updateRows === 0){
             return res.status(404).json(jsonResponse({
                 status: 404,
@@ -78,9 +110,10 @@ export const updateStock = async (req, res) => {
             data: null
         }))
 
+    } catch (e) {
 
-    }
-    catch(e){
+        console.error(e)
+
         return res.status(500).json(jsonResponse({
             status: 500,
             message: "Error al actualizar el stock",

@@ -30,21 +30,17 @@ export const login = async (req, res) => {
         }))
     }
 
-const isValidPassword = await bcrypt.compare(
-    password,
-    user.password_hash
-)
+    const isValidPassword = await bcrypt.compare( password, user.password_hash)
 
 
-if (!isValidPassword) {
-    return res.status(401).json(
-        jsonResponse({
+    if (!isValidPassword) {
+        return res.status(401).json( jsonResponse({
             status: 401,
             message: 'Credenciales inválidas',
             data: null
         })
-    )
-}
+        )
+    }
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' })  
 
@@ -62,7 +58,7 @@ if (!isValidPassword) {
 
     } catch (error) {
         console.error("Error en login:", error)
-        res.status(500).json(jsonResponse({ 
+        return res.status(500).json(jsonResponse({ 
             status: 500, 
             message: 'Error interno del servidor',
             data: null
